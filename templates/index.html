@@ -6,7 +6,7 @@
     <title>AI Art Generator</title>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
-      /* General Styling */
+   
       body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -14,7 +14,7 @@
         color: #ffffff;
       }
 
-      /* Background Styling */
+     
       #particles-js {
         position: fixed;
         top: 0;
@@ -25,7 +25,7 @@
         z-index: -1; /* Behind all content */
       }
 
-      /* Container Styling */
+     
       .container {
         text-align: center;
         padding: 50px 20px;
@@ -42,7 +42,7 @@
         margin-bottom: 20px;
       }
 
-      /* Input Section */
+      
       .input-section {
         margin-bottom: 30px;
       }
@@ -82,7 +82,6 @@
         transform: scale(1.05);
       }
 
-      /* Gallery Section */
       .gallery {
         margin: 20px auto;
       }
@@ -123,10 +122,10 @@
     </style>
   </head>
   <body>
-    <!-- Particle Background -->
+   
     <div id="particles-js"></div>
 
-    <!-- Main Content -->
+
     <div class="container">
       <div class="header">
         <h1>Create Art from Words</h1>
@@ -154,7 +153,7 @@
     </div>
 
     <script>
-      // Initialize Particle.js
+     
       particlesJS("particles-js", {
         particles: {
           number: {
@@ -223,7 +222,6 @@
         retina_detect: true,
       });
 
-      // Image generation logic
       async function generateImage() {
         const prompt = document.getElementById("prompt").value;
         const loading = document.getElementById("loading");
@@ -234,7 +232,7 @@
           return;
         }
 
-        // Show loading spinner
+       
         loading.classList.remove("hidden");
         resultImage.classList.add("hidden");
 
@@ -255,7 +253,7 @@
           const imageUrl = `/static/${data.filename}`;
           resultImage.src = imageUrl;
 
-          // Show the generated image
+       
           resultImage.classList.remove("hidden");
         } catch (error) {
           alert(error.message);
