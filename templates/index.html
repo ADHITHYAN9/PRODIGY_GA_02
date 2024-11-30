@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Art Generator</title>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+      /* General Styling */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #ffffff;
+      }
+
+      /* Background Styling */
+      #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1c1f2b, #3a4260);
+        z-index: -1; /* Behind all content */
+      }
+
+      /* Container Styling */
+      .container {
+        text-align: center;
+        padding: 50px 20px;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 1.2rem;
+        color: #b0b3c5;
+        margin-bottom: 20px;
+      }
+
+      /* Input Section */
+      .input-section {
+        margin-bottom: 30px;
+      }
+
+      .input-section input {
+        width: 50%;
+        padding: 15px;
+        border: 2px solid #b0b3c5;
+        border-radius: 25px;
+        font-size: 1rem;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+        background-color: #2b2f3a;
+        color: #ffffff;
+        outline: none;
+      }
+
+      .input-section input:focus {
+        border-color: #50c8ff;
+        box-shadow: 0 0 10px 2px rgba(80, 200, 255, 0.5);
+      }
+
+      .input-section button {
+        padding: 15px 25px;
+        font-size: 1rem;
+        color: #ffffff;
+        background: linear-gradient(90deg, #50c8ff, #467eff);
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 10px rgba(70, 126, 255, 0.2);
+      }
+
+      .input-section button:hover {
+        background: linear-gradient(90deg, #467eff, #50c8ff);
+        transform: scale(1.05);
+      }
+
+      /* Gallery Section */
+      .gallery {
+        margin: 20px auto;
+      }
+
+      .gallery img {
+        max-width: 60%;
+        border-radius: 10px;
+        margin-top: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .loading {
+        margin-top: 20px;
+      }
+
+      .spinner {
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #50c8ff;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <div class="header">
+        <h1>Create Art from Words</h1>
+        <p>Type a description, and watch AI bring your imagination to life.</p>
+      </div>
+
+      <div class="input-section">
+        <input
+          type="text"
+          id="prompt"
+          placeholder="Describe your art (e.g., lion in a sunset)"
+        />
+        <button id="generate-button" onclick="generateImage()">
+          Create a Picture
+        </button>
+      </div>
+
+      <div class="gallery" id="gallery">
+        <div id="loading" class="loading hidden">
+          <div class="spinner"></div>
+          <p>Our AI is working its magic...</p>
+        </div>
+        <img id="result-image" class="hidden" />
+      </div>
+    </div>
+
+    <script>
+      // Initialize Particle.js
+      particlesJS("particles-js", {
+        particles: {
+          number: {
+            value: 100,
+            density: {
+              enable: true,
+              value_area: 800,
+            },
+          },
+          color: {
+            value: "#ffffff",
+          },
+          shape: {
+            type: "circle",
+            stroke: {
+              width: 0,
+              color: "#000000",
+            },
+          },
+          opacity: {
+            value: 0.5,
+            random: false,
+          },
+          size: {
+            value: 3,
+            random: true,
+          },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ffffff",
+            opacity: 0.4,
+            width: 1,
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: "none",
+            random: false,
+            straight: false,
+            out_mode: "out",
+            bounce: false,
+          },
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: {
+              enable: true,
+              mode: "repulse",
+            },
+            onclick: {
+              enable: true,
+              mode: "push",
+            },
+          },
+          modes: {
+            repulse: {
+              distance: 100,
+            },
+            push: {
+              particles_nb: 4,
+            },
+          },
+        },
+        retina_detect: true,
+      });
+
+      // Image generation logic
+      async function generateImage() {
+        const prompt = document.getElementById("prompt").value;
+        const loading = document.getElementById("loading");
+        const resultImage = document.getElementById("result-image");
+
+        if (!prompt) {
+          alert("Please enter a description!");
+          return;
+        }
+
+        // Show loading spinner
+        loading.classList.remove("hidden");
+        resultImage.classList.add("hidden");
+
+        try {
+          const response = await fetch("/generate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ prompt }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to generate image");
+          }
+
+          const data = await response.json();
+          const imageUrl = `/static/${data.filename}`;
+          resultImage.src = imageUrl;
+
+          // Show the generated image
+          resultImage.classList.remove("hidden");
+        } catch (error) {
+          alert(error.message);
+        } finally {
+          // Hide loading spinner
+          loading.classList.add("hidden");
+        }
+      }
+    </script>
+  </body>
+</html>
